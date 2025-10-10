@@ -3,7 +3,7 @@
                     (Student name - Vaishali Jorwekar)
 --------------------------------------------------------------------------------------------------------
 Problem statement: Dataset contains information about Wine type based on some features
-                   Multi-class classification of Wine Type using Decision Tree and  Random Forest
+                   Multi-class classification of Wine Type using KNN and  Random Forest
 --------------------------------------------------------------------------------------------------------"""
 #####################################################################################################
 # Required Python Packages
@@ -12,7 +12,7 @@ import pandas as pd
 import os,argparse
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -30,7 +30,7 @@ RANDOM_STATE=42
 TEST_SIZE=0.2
 TARGET_COLUMN="Class"
 """Classification model list"""
-CLF_MODELS=  {"Decision Tree Classifier":DecisionTreeClassifier(),
+CLF_MODELS=  {"KNN":KNeighborsClassifier(),
               "Random Forest Classifier":RandomForestClassifier()}
 
 #####################################################################################################
@@ -55,7 +55,7 @@ def ensure_dir(path:str):
 def parse_args():
     p=argparse.ArgumentParser(description="Wine Classification Case Study")
     p.add_argument("--train",action="store_true",
-                   help="Train Using 'Decision Tree & Random Forest' and Save Artifacts")
+                   help="Train Using 'KNN & Random Forest' and Save Artifacts")
     p.add_argument("--test",action="store_true",help="Test the model using saved model")
     p.add_argument("--samples",type=int,default=10,help="Number of samples for testing ")
     return p.parse_args() 
@@ -288,12 +288,12 @@ def train_and_evaluate():
     #Split data set  
     x_Train,x_Test,y_Train,y_Test=spliDataSet(df)
 
-    #Decision Tree Classifier
-    dTree=build_Pipeline(DecisionTreeClassifier(max_depth=10))
+    #KNN model pipeline
+    Knn=build_Pipeline(KNeighborsClassifier(n_neighbors=3))
      #Train Model
-    dTree=trainPipeline(dTree,x_Train,y_Train)
-    dTreeAccuracy,dTConfusionMatrix,dTClassificationReport\
-                            =testModelAndAccuracyCalculation(dTree,x_Test,y_Test)
+    Knn=trainPipeline(Knn,x_Train,y_Train)
+    KnnAccuracy,KnnConfusionMatrix,KnnClassificationReport\
+                            =testModelAndAccuracyCalculation(Knn,x_Test,y_Test)
     
      #Random Forest 
     rForest=build_Pipeline(RandomForestClassifier(max_depth=10))
@@ -303,10 +303,10 @@ def train_and_evaluate():
                             =testModelAndAccuracyCalculation(rForest,x_Test,y_Test)
     
 
-    algorithmDetails={"Algorithm Name":["Decision Tree Classifier","Random Forest Classifier"],
-                      "Accuracy Score":[dTreeAccuracy*100,rForestAccuracy*100],
-                      "Confusion Matrix":[dTConfusionMatrix,rForestConfusionMatrix],
-                      "Classification Report":[dTClassificationReport,rForestClassificationReport]}
+    algorithmDetails={"Algorithm Name":["KNN","Random Forest Classifier"],
+                      "Accuracy Score":[KnnAccuracy*100,rForestAccuracy*100],
+                      "Confusion Matrix":[KnnConfusionMatrix,rForestConfusionMatrix],
+                      "Classification Report":[KnnClassificationReport,rForestClassificationReport]}
     #Plot and save accuracy plot and accuracy score
     plotAndSaveAccuracyScore(algorithmDetails)
     #Plot confusion matrix
@@ -314,7 +314,7 @@ def train_and_evaluate():
     #Save classification Report
     save_classification_report(algorithmDetails)
     #Save Trained models
-    saveTrainedModel(dTree,algorithmDetails["Algorithm Name"][0])
+    saveTrainedModel(Knn,algorithmDetails["Algorithm Name"][0])
     saveTrainedModel(rForest,algorithmDetails["Algorithm Name"][1])
 #####################################################################################################
 #   Function name    :  loadTrainedModel
